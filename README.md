@@ -1,1 +1,9 @@
-# Examen-WEB2-Backend
+# WEB2 final exam: Backend
+
+- STD24075: Mamy RAMANAMAHEFA
+
+- STD24109: Andriamanga Rubis RANAIVOSOA
+
+- STD25063: Ny Olontsoa Nombana RAMANITRINIAINA
+
+- STD25064: ANDRIANTSONINA Harena

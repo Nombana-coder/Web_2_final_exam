@@ -1,0 +1,23 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "- STD24075 Mamy",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nombana-coder/Web_2_final_exam.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Nombana-coder/Web_2_final_exam/issues"
+  },
+  "homepage": "https://github.com/Nombana-coder/Web_2_final_exam#readme",
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}
