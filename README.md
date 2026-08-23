@@ -1,6 +1,6 @@
 # WEB2 final exam: Backend
 
-- STD24075: Mamy RAMANAMAHEFA
+- STD24075: Mamy Ny Aina RAMANAMAHEFA
 
 - STD24109: Andriamanga Rubis RANAIVOSOA
 
