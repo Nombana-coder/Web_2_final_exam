@@ -2,7 +2,7 @@ import { Pool } from "pg";
 import dotenv from "dotenv";
 
 dotenv.config();
-
+ 
 /**
  * Shared PostgreSQL connection pool. Import `pool` in any Repository
  * and use parameterized queries only:

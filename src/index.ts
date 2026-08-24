@@ -5,7 +5,7 @@ import { testDbConnection } from "./security/db";
 import { errorHandler } from "./middlewares/errorHandler";
 
 dotenv.config();
-
+ 
 const app = express();
 
 app.use(cors());
