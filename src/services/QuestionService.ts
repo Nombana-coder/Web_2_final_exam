@@ -1,20 +1,26 @@
 import { QuestionRepository, QuestionData } from '../repositories/QuestionRepository';
+import { BadRequest, Conflict, NotFound } from '../security/AppError';
 
 export class QuestionService {
   private static validateQuestionRules(data: QuestionData) {
     if (!data.statement || typeof data.points !== 'number' || data.points <= 0) {
-      throw { status: 400, message: 'Énoncé et points valides requis' };
+      throw BadRequest('Énoncé et points valides requis');
     }
 
     // RG-04: Entre 2 et 6 choix
     if (!Array.isArray(data.choices) || data.choices.length < 2 || data.choices.length > 6) {
-      throw { status: 400, message: 'Une question doit comporter entre 2 et 6 choix (RG-04)' };
+      throw BadRequest('Une question doit comporter entre 2 et 6 choix (RG-04)');
+    }
+
+    // Chaque choix doit avoir un texte non vide
+    if (data.choices.some(c => !c.text || !c.text.trim())) {
+      throw BadRequest('Chaque choix doit avoir un texte non vide');
     }
 
     // RG-04: Exactly one correct choice
     const correctCount = data.choices.filter(c => c.isCorrect === true).length;
     if (correctCount !== 1) {
-      throw { status: 400, message: 'Exactement un choix doit être marqué comme correct (RG-04)' };
+      throw BadRequest('Exactement un choix doit être marqué comme correct (RG-04)');
     }
   }
 
@@ -26,7 +32,7 @@ export class QuestionService {
     // RG-08: Blocage si des tentatives existent
     const hasAttempts = await QuestionRepository.hasAttempts(examId);
     if (hasAttempts) {
-      throw { status: 409, message: 'Impossible d\'ajouter des questions : l\'examen possède déjà des tentatives (RG-08)' };
+      throw Conflict('Impossible d\'ajouter des questions : l\'examen possède déjà des tentatives (RG-08)');
     }
 
     this.validateQuestionRules(data);
@@ -36,12 +42,12 @@ export class QuestionService {
   static async updateQuestion(questionId: number, data: QuestionData) {
     const examId = await QuestionRepository.getExamIdByQuestionId(questionId);
     if (!examId) {
-      throw { status: 404, message: 'Question non trouvée' };
+      throw NotFound('Question non trouvée');
     }
 
     const hasAttempts = await QuestionRepository.hasAttempts(examId);
     if (hasAttempts) {
-      throw { status: 409, message: 'Impossible de modifier cette question : l\'examen possède déjà des tentatives (RG-08)' };
+      throw Conflict('Impossible de modifier cette question : l\'examen possède déjà des tentatives (RG-08)');
     }
 
     this.validateQuestionRules(data);
@@ -51,12 +57,12 @@ export class QuestionService {
   static async deleteQuestion(questionId: number) {
     const examId = await QuestionRepository.getExamIdByQuestionId(questionId);
     if (!examId) {
-      throw { status: 404, message: 'Question non trouvée' };
+      throw NotFound('Question non trouvée');
     }
 
     const hasAttempts = await QuestionRepository.hasAttempts(examId);
     if (hasAttempts) {
-      throw { status: 409, message: 'Impossible de supprimer cette question : l\'examen possède déjà des tentatives (RG-08)' };
+      throw Conflict('Impossible de supprimer cette question : l\'examen possède déjà des tentatives (RG-08)');
     }
 
     await QuestionRepository.deleteQuestion(questionId);

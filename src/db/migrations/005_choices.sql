@@ -3,4 +3,4 @@ CREATE TABLE choices (
     question_id INT NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
     text TEXT NOT NULL,
     is_correct BOOLEAN NOT NULL DEFAULT FALSE
-);*
+);
