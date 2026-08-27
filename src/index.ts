@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import { testDbConnection } from "./security/db";
 import { errorHandler } from "./middlewares/errorHandler";
 import authRoutes from "./controllers/authRoutes";
+import attemptRoutes from './routes/attemptRoutes';
+
 
 dotenv.config();
 
@@ -13,6 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
+app.use('/api', attemptRoutes);
 
 // --- Other teammates mount their own router under /api here, e.g.: ---
 //   app.use("/api/students", studentsRouter);
