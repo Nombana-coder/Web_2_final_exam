@@ -5,8 +5,8 @@ import { Conflict, NotFound } from "../security/AppError";
 import { toPublicUser, PublicUser } from "../models/User";
 import {
   parsePagination,
-  buildPaginatedResult,
-  PaginatedResult,
+  buildPaginatedResponse,
+  PaginatedResponse,
 } from "../utils/pagination";
 
 const SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS) || 10;
@@ -26,13 +26,13 @@ export const StudentService = {
   async list(
     rawPage: unknown,
     rawLimit: unknown
-  ): Promise<PaginatedResult<PublicUser>> {
-    const { page, limit, offset } = parsePagination(rawPage, rawLimit);
+  ): Promise<PaginatedResponse<PublicUser>> {
+    const { page, limit, offset } = parsePagination({ page: rawPage, limit: rawLimit });
     const { rows, total } = await StudentRepository.findAllPaginated(
       limit,
       offset
     );
-    return buildPaginatedResult(rows.map(toPublicUser), total, page, limit);
+    return buildPaginatedResponse(rows.map(toPublicUser), total, page, limit);
   },
 
   async getById(id: number): Promise<PublicUser> {

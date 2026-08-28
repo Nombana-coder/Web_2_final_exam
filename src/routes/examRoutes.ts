@@ -3,10 +3,6 @@ import { ExamController } from '../controllers/ExamController';
 import { requireAuth, requireRole } from '../middlewares/auth';
 import { asyncHandler } from '../middlewares/errorHandler';
 
-// Surface imposée : GET/POST /api/exams, GET/PUT/DELETE /api/exams/:id
-// Toutes les routes sont réservées à l'administrateur.
-// (les routes /api/exams/:id/questions et /results sont gérées par une autre tâche)
-
 const router = Router();
 const controller = new ExamController();
 

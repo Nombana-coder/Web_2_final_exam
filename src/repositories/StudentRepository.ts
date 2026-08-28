@@ -12,9 +12,6 @@ export interface UpdateStudentInput {
   email?: string;
 }
 
-/**
- * Students are rows in `users` with role = 'student'. So  student management is admin-only and never touches other admin accounts.
- */
 export const StudentRepository = {
   async findAllPaginated(
     limit: number,

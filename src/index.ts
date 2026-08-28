@@ -5,6 +5,10 @@ import { testDbConnection } from "./security/db";
 import { errorHandler } from "./middlewares/errorHandler";
 import authRoutes from "./routes/authRoutes";
 import studentRoutes from "./controllers/studentRoutes";
+import courseRoutes from "./routes/courseRoutes";
+import examRoutes from "./routes/examRoutes";
+import questionRoutes from "./routes/questionRoutes";
+import attemptRoutes from "./routes/attemptRoutes";
 
 dotenv.config();
  
@@ -15,6 +19,10 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/students", studentRoutes);
+app.use("/api/courses", courseRoutes);
+app.use("/api/exams", examRoutes);
+app.use("/api", questionRoutes);
+app.use("/api", attemptRoutes);
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });

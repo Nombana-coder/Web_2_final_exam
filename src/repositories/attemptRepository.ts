@@ -3,10 +3,10 @@ import { pool } from '../security/db';
 export class AttemptRepository {
 async findAvailableExams(studentId: number) {
     const query = `
-    SELECT e.id, e.name, e.start_date, e.end_date, c.name as course_name
+    SELECT e.id, e.title, e.start_at, e.end_at, c.name as course_name
     FROM exams e
     JOIN courses c ON e.course_id = c.id
-    WHERE CURRENT_TIMESTAMP BETWEEN e.start_date AND e.end_date -- RG-03
+    WHERE CURRENT_TIMESTAMP BETWEEN e.start_at AND e.end_at -- RG-03
         AND e.id NOT IN (SELECT exam_id FROM attempts WHERE student_id = $1); -- RG-02
     `;
     const { rows } = await pool.query(query, [studentId]);
@@ -23,19 +23,19 @@ async findAttempt(studentId: number, examId: number) {
 
 async getExamForStudent(examId: number) {
     const query = `
-    SELECT e.id, e.name, e.start_date, e.end_date,
+    SELECT e.id, e.title, e.start_at, e.end_at,
             json_agg(json_build_object(
             'id', q.id, 
             'statement', q.statement, 
             'points', q.points,
             'choices', (
-                SELECT json_agg(json_build_object('id', c.id, 'statement', c.statement)) 
+                SELECT json_agg(json_build_object('id', c.id, 'text', c.text))
                 FROM choices c WHERE c.question_id = q.id
             )
             )) as questions
     FROM exams e
     JOIN questions q ON q.exam_id = e.id
-    WHERE e.id = $1 AND CURRENT_TIMESTAMP BETWEEN e.start_date AND e.end_date -- RG-03
+    WHERE e.id = $1 AND CURRENT_TIMESTAMP BETWEEN e.start_at AND e.end_at -- RG-03
     GROUP BY e.id;
     `;
     const { rows } = await pool.query(query, [examId]);
@@ -87,7 +87,7 @@ async saveAttempt(studentId: number, examId: number, score: number, choices: num
 
     async getStudentResults(studentId: number) {
         const { rows: results } = await pool.query(
-            `SELECT a.id, a.score, a.submitted_at, e.name as exam_name
+            `SELECT a.id, a.score, a.submitted_at, e.title as exam_name
             FROM attempts a JOIN exams e ON a.exam_id = e.id
             WHERE a.student_id = $1 ORDER BY a.submitted_at DESC;`,
             [studentId]

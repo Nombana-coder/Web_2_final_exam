@@ -47,9 +47,7 @@ export class ExamService {
   }
 
   async delete(id: number): Promise<void> {
-    await this.getById(id); // 404 si absent
 
-    // RG-09 : un examen qui possède des tentatives ne peut pas être supprimé.
     const hasAttempts = await examRepository.hasAttempts(id);
     if (hasAttempts) {
       throw Conflict('Cannot delete an exam that has attempts');

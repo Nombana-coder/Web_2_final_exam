@@ -16,9 +16,9 @@ export class ExamRepository {
     }
 
     const result = await pool.query(`
-      SELECT id, title, start_date
+      SELECT id, title, start_at
       FROM exams
-      ORDER BY start_date
+      ORDER BY start_at
     `);
     return result.rows;
   }

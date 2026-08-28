@@ -60,7 +60,6 @@ export class CourseService {
   async delete(id: number): Promise<void> {
     await this.getById(id); // 404 si absent
 
-    // RG-09 : un cours qui possède des examens ne peut pas être supprimé.
     const hasExams = await courseRepository.hasExams(id);
     if (hasExams) {
       throw Conflict('Cannot delete a course that has exams');
@@ -69,8 +68,6 @@ export class CourseService {
     try {
       await courseRepository.delete(id);
     } catch (err: any) {
-      // Filet de sécurité si la contrainte FK (ON DELETE RESTRICT) se
-      // déclenche malgré la vérification ci-dessus (ex. course de concurrence).
       if (err.code === '23503') {
         throw Conflict('Cannot delete a course that has exams');
       }

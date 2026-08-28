@@ -7,17 +7,14 @@ export class QuestionService {
       throw BadRequest('Énoncé et points valides requis');
     }
 
-    // RG-04: Entre 2 et 6 choix
     if (!Array.isArray(data.choices) || data.choices.length < 2 || data.choices.length > 6) {
       throw BadRequest('Une question doit comporter entre 2 et 6 choix (RG-04)');
     }
 
-    // Chaque choix doit avoir un texte non vide
     if (data.choices.some(c => !c.text || !c.text.trim())) {
       throw BadRequest('Chaque choix doit avoir un texte non vide');
     }
 
-    // RG-04: Exactly one correct choice
     const correctCount = data.choices.filter(c => c.isCorrect === true).length;
     if (correctCount !== 1) {
       throw BadRequest('Exactement un choix doit être marqué comme correct (RG-04)');
@@ -29,7 +26,6 @@ export class QuestionService {
   }
 
   static async createQuestion(examId: number, data: QuestionData) {
-    // RG-08: Blocage si des tentatives existent
     const hasAttempts = await QuestionRepository.hasAttempts(examId);
     if (hasAttempts) {
       throw Conflict('Impossible d\'ajouter des questions : l\'examen possède déjà des tentatives (RG-08)');

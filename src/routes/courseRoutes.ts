@@ -3,9 +3,6 @@ import { CourseController } from '../controllers/CourseController';
 import { requireAuth, requireRole } from '../middlewares/auth';
 import { asyncHandler } from '../middlewares/errorHandler';
 
-// Surface imposée : GET/POST /api/courses, PUT/DELETE /api/courses/:id
-// Toutes les routes sont réservées à l'administrateur.
-
 const router = Router();
 const controller = new CourseController();
 

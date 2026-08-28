@@ -1,11 +1,3 @@
--- Migration 002 : table courses
---
--- RG-09 : un cours qui possède des examens ne peut pas être supprimé.
---         Cette règle est garantie ici au niveau base de données par la
---         contrainte FK "ON DELETE RESTRICT" posée sur exams.course_id
---         dans la migration 003 (elle sert de filet de sécurité en plus
---         de la vérification applicative faite dans CourseService).
-
 CREATE TABLE IF NOT EXISTS courses (
     id          SERIAL PRIMARY KEY,
     code        VARCHAR(20)  NOT NULL UNIQUE,

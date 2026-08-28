@@ -1,6 +1,5 @@
 export type UserRole = "admin" | "student";
 
-/** Full row as stored in the DB. Never send password_hash to the client. */
 export interface User {
   id: number;
   name: string;

@@ -1,32 +1,35 @@
 
-import jwt from 'jsonwebtoken';
+import bcrypt from "bcrypt";
+import { UserRepository } from "../repositories/UserRepository";
+import { signToken } from "../security/jwt";
+import { Unauthorized, Forbidden } from "../security/AppError";
 
 export class AuthService {
   static async login(email: string, password: string) {
-    // BYPASS URGENT POUR DÉBLOQUER PERSONNE 2
-    const secret = process.env.JWT_SECRET || 'super_secret_jwt_key_123456';
-    
-    // On génère directement un token pour un admin (id: 1, role: 'admin')
-    const token = jwt.sign(
-      { userId: 1, role: 'admin' },
-      secret,
-      { expiresIn: '24h' }
-    );
+    const user = await UserRepository.findByEmail(email);
+    if (!user) {
+      throw Unauthorized("Invalid credentials");
+    }
+
+    const passwordMatches = await bcrypt.compare(password, user.password_hash);
+    if (!passwordMatches) {
+      throw Unauthorized("Invalid credentials");
+    }
+
+    if (!user.active) {
+      throw Forbidden("Account is deactivated");
+    }
+
+    const token = signToken({ sub: user.id, role: user.role });
 
     return {
       token,
       user: {
-        id: 1,
-        name: 'Admin Test',
-        email: email,
-        role: 'admin'
-      }
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     };
   }
 }
-
-
-
-/*
-
-*/

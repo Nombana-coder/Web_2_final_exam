@@ -5,7 +5,6 @@ import { requireAuth, requireRole } from '../middlewares/auth';
 
 const router = Router();
 
-// Route pour POST /api/exams/:id/questions
 router.post('/exams/:id/questions', requireAuth, requireRole('admin'), QuestionController.create);
 router.get('/exams/:id/questions', requireAuth, requireRole('admin'), QuestionController.getByExam);
 router.put('/questions/:id', requireAuth, requireRole('admin'), QuestionController.update);

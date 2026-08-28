@@ -17,7 +17,7 @@ export class QuestionRepository {
   // Vérifie s'il existe déjà des tentatives sur l'examen (RG-08)
   static async hasAttempts(examId: number): Promise<boolean> {
     const res = await pool.query(
-      'SELECT COUNT(*) FROM exam_attempts WHERE exam_id = $1',
+      'SELECT COUNT(*) FROM attempts WHERE exam_id = $1',
       [examId]
     );
     return parseInt(res.rows[0].count, 10) > 0;
