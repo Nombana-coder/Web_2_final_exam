@@ -1,31 +1,37 @@
-import express, { Application, Request, Response, NextFunction } from "express";
+import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import authRoutes from "./routes/authRoutes";
+import studentRoutes from "./routes/studentRoutes";
+import courseRoutes from "./routes/courseRoutes";
+import examRoutes from "./routes/examRoutes";
 import questionRoutes from "./routes/questionRoutes";
+import attemptRoutes from "./routes/attemptRoutes";
+import { errorHandler } from "./middlewares/errorHandler";
 
 dotenv.config();
 
-const app: Application = express();
+const app = express();
 
 // Middlewares globaux
 app.use(cors());
 app.use(express.json());
 
-// Route de santé (Healthcheck)
-app.get("/health", (_req: Request, res: Response) => {
-  res.json({ status: "OK", timestamp: new Date() });
-});
-
-// Montage des routes d'API (Toutes préfixées par /api)
+app.use("/api/auth", authRoutes);
+app.use("/api/students", studentRoutes);
+app.use("/api/courses", courseRoutes);
+app.use("/api/exams", examRoutes);
 app.use("/api", questionRoutes);
-// app.use("/api/auth", authRoutes); // Si tu as un fichier de routes pour /login
+app.use("/api", attemptRoutes);
 
-// Middleware de gestion globale des erreurs
-app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  console.error("❌ Erreur serveur :", err);
-  const status = err.statusCode || err.status || 500;
-  const message = err.message || "Internal server error";
-  res.status(status).json({ message });
+app.get(["/health", "/api/health"], (_req, res) => {
+  res.json({ status: "ok" });
 });
+
+app.use("/api", (_req, res) => {
+  res.status(404).json({ message: "Not found" });
+});
+
+app.use(errorHandler);
 
 export default app;

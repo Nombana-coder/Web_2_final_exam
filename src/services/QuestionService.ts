@@ -15,7 +15,7 @@ export class QuestionService {
       throw BadRequest('Chaque choix doit avoir un texte non vide');
     }
 
-    const correctCount = data.choices.filter(c => c.isCorrect === true).length;
+    const correctCount = data.choices.filter(c => c.is_correct === true).length;
     if (correctCount !== 1) {
       throw BadRequest('Exactement un choix doit être marqué comme correct (RG-04)');
     }

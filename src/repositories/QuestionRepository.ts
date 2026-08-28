@@ -3,7 +3,7 @@ import { pool } from '../security/db';
 export interface ChoiceInput {
   id?: number;
   text: string;
-  isCorrect: boolean;
+  is_correct: boolean;
 }
 
 export interface QuestionData {
@@ -40,7 +40,7 @@ export class QuestionRepository {
     const questions = [];
     for (const q of qRes.rows) {
       const cRes = await pool.query(
-        'SELECT id, text, is_correct AS "isCorrect" FROM choices WHERE question_id = $1 ORDER BY id ASC',
+        'SELECT id, text, is_correct FROM choices WHERE question_id = $1 ORDER BY id ASC',
         [q.id]
       );
       questions.push({ ...q, choices: cRes.rows });
@@ -62,8 +62,8 @@ export class QuestionRepository {
       const insertedChoices = [];
       for (const choice of data.choices) {
         const cRes = await client.query(
-          'INSERT INTO choices (question_id, text, is_correct) VALUES ($1, $2, $3) RETURNING id, text, is_correct AS "isCorrect"',
-          [newQuestion.id, choice.text, choice.isCorrect]
+          'INSERT INTO choices (question_id, text, is_correct) VALUES ($1, $2, $3) RETURNING id, text, is_correct',
+          [newQuestion.id, choice.text, choice.is_correct]
         );
         insertedChoices.push(cRes.rows[0]);
       }
@@ -93,8 +93,8 @@ export class QuestionRepository {
       const insertedChoices = [];
       for (const choice of data.choices) {
         const cRes = await client.query(
-          'INSERT INTO choices (question_id, text, is_correct) VALUES ($1, $2, $3) RETURNING id, text, is_correct AS "isCorrect"',
-          [questionId, choice.text, choice.isCorrect]
+          'INSERT INTO choices (question_id, text, is_correct) VALUES ($1, $2, $3) RETURNING id, text, is_correct',
+          [questionId, choice.text, choice.is_correct]
         );
         insertedChoices.push(cRes.rows[0]);
       }

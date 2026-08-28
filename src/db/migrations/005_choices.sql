@@ -1,4 +1,4 @@
-CREATE TABLE choices (
+CREATE TABLE IF NOT EXISTS choices (
     id SERIAL PRIMARY KEY,
     question_id INT NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
     text TEXT NOT NULL,

@@ -1,5 +1,9 @@
 # WEB2 final exam: Backend
 
+Run the database migrations in order with `npm run migrate`. Applied migrations
+are recorded in `schema_migrations`, and the legacy all-in-one SQL export is kept
+under `src/db/legacy` rather than being executed by the migration runner.
+
 - STD24075: Mamy Ny Aina RAMANAMAHEFA
 
 - STD24109: Andriamanga Rubis RANAIVOSOA

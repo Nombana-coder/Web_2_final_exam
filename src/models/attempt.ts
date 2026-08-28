@@ -1,28 +1,28 @@
 export interface Attempt {
     id?: number;
-    studentId: number;
-    examId: number;
+    student_id: number;
+    exam_id: number;
     score: number;
-    submittedAt?: Date;
+    submitted_at?: Date;
     }
 
 export interface Answer {
     id?: number;
-    attemptId: number;
-    questionId: number;
-    choiceId: number;
+    attempt_id: number;
+    question_id: number;
+    choice_id: number;
 }
 
 export interface StudentExamResult {
     id: number;
-    examTitle: string;
+    exam_title: string;
     score: number;
-    submittedAt: Date;
+    submitted_at: Date;
 }
 
 export interface AdminExamResult {
     id: number;
     email: string;
     score: number;
-    submittedAt: Date;
+    submitted_at: Date;
 }

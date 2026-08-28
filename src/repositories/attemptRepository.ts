@@ -87,7 +87,7 @@ async saveAttempt(studentId: number, examId: number, score: number, choices: num
 
     async getStudentResults(studentId: number) {
         const { rows: results } = await pool.query(
-            `SELECT a.id, a.score, a.submitted_at, e.title as exam_name
+            `SELECT a.id, a.score, a.submitted_at, e.title as exam_title
             FROM attempts a JOIN exams e ON a.exam_id = e.id
             WHERE a.student_id = $1 ORDER BY a.submitted_at DESC;`,
             [studentId]
