@@ -1,5 +1,5 @@
-import { pool } from '../Security/db';
-import { Course, CreateCourseInput, UpdateCourseInput } from '../Model/Course';
+import { pool } from '../security/db';
+import { Course, CreateCourseInput, UpdateCourseInput } from '../models/Course';
 
 export class CourseRepository {
   async findAll(limit: number, offset: number): Promise<Course[]> {

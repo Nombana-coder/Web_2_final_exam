@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { ExamService } from '../Service/ExamService';
+import { ExamService } from '../services/ExamService';
 import { parsePagination } from '../utils/pagination';
-import { BadRequest } from '../Security/AppError';
+import { BadRequest } from '../security/AppError';
 
 const examService = new ExamService();
 

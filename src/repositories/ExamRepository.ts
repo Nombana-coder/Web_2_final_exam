@@ -1,5 +1,5 @@
-import { pool } from '../Security/db';
-import { Exam, CreateExamInput, UpdateExamInput } from '../Model/Exam';
+import { pool } from '../security/db';
+import { Exam, CreateExamInput, UpdateExamInput } from '../models/Exam';
 
 export class ExamRepository {
   async findAll(limit: number, offset: number, courseId?: number): Promise<Exam[]> {

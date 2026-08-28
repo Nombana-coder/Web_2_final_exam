@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { CourseController } from '../Controller/CourseController';
+import { CourseController } from '../controllers/CourseController';
 import { requireAuth, requireRole } from '../middlewares/auth';
 import { asyncHandler } from '../middlewares/errorHandler';
 

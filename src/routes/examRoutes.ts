@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { ExamController } from '../Controller/ExamController';
+import { ExamController } from '../controllers/ExamController';
 import { requireAuth, requireRole } from '../middlewares/auth';
 import { asyncHandler } from '../middlewares/errorHandler';
 

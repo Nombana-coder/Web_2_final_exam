@@ -1,7 +1,7 @@
-import { ExamRepository } from '../Repositorie/ExamRepository';
-import { CourseRepository } from '../Repositorie/CourseRepository';
-import { Exam, CreateExamInput, UpdateExamInput } from '../Model/Exam';
-import { NotFound, Conflict, BadRequest } from '../Security/AppError';
+import { ExamRepository } from '../repositories/ExamRepository';
+import { CourseRepository } from '../repositories/CourseRepository';
+import { Exam, CreateExamInput, UpdateExamInput } from '../models/Exam';
+import { NotFound, Conflict, BadRequest } from '../security/AppError';
 import { buildPaginatedResponse, PaginatedResponse } from '../utils/pagination';
 
 const examRepository = new ExamRepository();

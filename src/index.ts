@@ -3,7 +3,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { testDbConnection } from "./security/db";
 import { errorHandler } from "./middlewares/errorHandler";
-import authRoutes from "./controllers/authRoutes";
+import authRoutes from "./routes/authRoutes";
+import courseRoutes from "./routes/courseRoutes";
+import examRoutes from "./routes/examRoutes";
 
 dotenv.config();
 
@@ -13,11 +15,11 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/courses", courseRoutes);
+app.use("/api/exams", examRoutes);
 
 // --- Other teammates mount their own router under /api here, e.g.: ---
 //   app.use("/api/students", studentsRouter);
-//   app.use("/api/courses", coursesRouter);
-//   app.use("/api/exams", examsRouter);
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });

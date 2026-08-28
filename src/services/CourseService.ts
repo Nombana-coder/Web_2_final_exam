@@ -1,6 +1,6 @@
-import { CourseRepository } from '../Repositorie/CourseRepository';
-import { Course, CreateCourseInput, UpdateCourseInput } from '../Model/Course';
-import { AppError, NotFound, Conflict, BadRequest } from '../Security/AppError';
+import { CourseRepository } from '../repositories/CourseRepository';
+import { Course, CreateCourseInput, UpdateCourseInput } from '../models/Course';
+import { AppError, NotFound, Conflict, BadRequest } from '../security/AppError';
 import { buildPaginatedResponse, PaginatedResponse } from '../utils/pagination';
 
 const courseRepository = new CourseRepository();
