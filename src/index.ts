@@ -7,7 +7,7 @@ import authRoutes from "./routes/authRoutes";
 import studentRoutes from "./controllers/studentRoutes";
 
 dotenv.config();
-
+ 
 const app = express();
 
 app.use(cors());
@@ -25,7 +25,6 @@ app.use("/api", (_req, res) => {
   res.status(404).json({ message: "Not found" });
 });
 
-// Error handler must be registered LAST
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;

@@ -23,3 +23,4 @@ export const Unauthorized = (message: string) => new AppError(401, message);
 export const Forbidden = (message: string) => new AppError(403, message);
 export const NotFound = (message: string) => new AppError(404, message);
 export const Conflict = (message: string) => new AppError(409, message);
+ 
