@@ -42,41 +42,37 @@ async getExamForStudent(examId: number) {
     return rows[0];
 }
 
-async calculateScore(examId: number, choiceIds: number[]) {
-    if (!choiceIds || choiceIds.length === 0) return 0;
-    const query = `
-    SELECT COALESCE(SUM(q.points), 0) AS score
-    FROM choices c
-    JOIN questions q ON c.question_id = q.id
-    WHERE c.id = ANY($1::int[]) AND q.exam_id = $2 AND c.is_correct = TRUE;
-    `;
-    const { rows } = await pool.query(query, [choiceIds, examId]);
-    return Number(rows[0].score);
-}
-
-async saveAttempt(studentId: number, examId: number, score: number, choices: number[]) {
+/**
+ * Persists an attempt and its answers. `answers` should already be
+ * filtered down to only the questions that were actually answered
+ * (RG-05: unanswered questions are simply omitted here).
+ * Returns the DB-generated attempt id and submitted_at timestamp.
+ */
+async saveAttempt(
+    studentId: number,
+    examId: number,
+    score: number,
+    answers: { question_id: number; choice_id: number }[]
+) {
     const client = await pool.connect();
     try {
     await client.query('BEGIN');
     const attemptRes = await client.query(
-        `INSERT INTO attempts (student_id, exam_id, score) VALUES ($1, $2, $3) RETURNING id`,
+        `INSERT INTO attempts (student_id, exam_id, score) VALUES ($1, $2, $3) RETURNING id, submitted_at`,
         [studentId, examId, score]
     );
     const attemptId = attemptRes.rows[0].id;
+    const submittedAt = attemptRes.rows[0].submitted_at;
 
-    if (choices && choices.length > 0) {
-        for (const choiceId of choices) {
-        const qRes = await client.query(`SELECT question_id FROM choices WHERE id = $1`, [choiceId]);
-        if (qRes.rows[0]) {
-            await client.query(
-            `INSERT INTO answers (attempt_id, question_id, choice_id) VALUES ($1, $2, $3)`,
-            [attemptId, qRes.rows[0].question_id, choiceId]
-            );
-        }
-        }
+    for (const answer of answers) {
+        await client.query(
+        `INSERT INTO answers (attempt_id, question_id, choice_id) VALUES ($1, $2, $3)`,
+        [attemptId, answer.question_id, answer.choice_id]
+        );
     }
+
     await client.query('COMMIT');
-    return attemptId;
+    return { attemptId, submittedAt };
     } catch (e) {
     await client.query('ROLLBACK');
     throw e;
@@ -101,9 +97,10 @@ async saveAttempt(studentId: number, examId: number, score: number, choices: num
 
     async getAdminExamResults(examId: number) {
         const { rows } = await pool.query(
-            `SELECT a.id, u.email, a.score, a.submitted_at
+            `SELECT u.id as student_id, u.name, a.score, a.submitted_at
             FROM attempts a JOIN users u ON a.student_id = u.id
-            WHERE a.exam_id = $1;`,
+            WHERE a.exam_id = $1
+            ORDER BY a.submitted_at DESC;`,
             [examId]
         );
         return rows;

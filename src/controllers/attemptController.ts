@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { AttemptService } from '../services/attemptService';
-import { Unauthorized } from '../security/AppError';
+import { AttemptService, SubmitAnswerInput } from '../services/attemptService';
+import { Unauthorized, BadRequest } from '../security/AppError';
 
 const service = new AttemptService();
 
@@ -17,9 +17,22 @@ async getExamForStudent(req: Request, res: Response) {
 
 async submitExam(req: Request, res: Response) {
     if (!req.user) throw Unauthorized("Not authenticated");
-    const { choices } = req.body;
-    const data = await service.submitExam(req.user.sub, Number(req.params.id), choices);
-    res.status(201).json(data);
+
+    const { answers } = req.body ?? {};
+    if (!Array.isArray(answers)) {
+        throw BadRequest("`answers` must be an array of { question_id, choice_id }");
+    }
+    for (const a of answers as SubmitAnswerInput[]) {
+        if (typeof a?.question_id !== "number") {
+            throw BadRequest("Each answer requires a numeric `question_id`");
+        }
+        if (a.choice_id !== null && a.choice_id !== undefined && typeof a.choice_id !== "number") {
+            throw BadRequest("`choice_id` must be a number or null");
+        }
+    }
+
+    const data = await service.submitExam(req.user.sub, Number(req.params.id), answers);
+    res.status(200).json(data);
 }
 
 async getStudentResults(req: Request, res: Response) {
