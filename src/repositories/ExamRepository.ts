@@ -15,13 +15,11 @@ export class ExamRepository {
       return result.rows;
     }
 
-    const result = await pool.query(
-      `SELECT id, course_id, title, description, start_at, end_at, created_at, updated_at
-       FROM exams
-       ORDER BY id ASC
-       LIMIT $1 OFFSET $2`,
-      [limit, offset]
-    );
+    const result = await pool.query(`
+      SELECT id, title, start_date
+      FROM exams
+      ORDER BY start_date
+    `);
     return result.rows;
   }
 
