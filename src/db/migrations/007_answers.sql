@@ -1,0 +1,6 @@
+CREATE TABLE answers (
+    id SERIAL PRIMARY KEY,
+    attempt_id INT NOT NULL REFERENCES attempts(id) ON DELETE CASCADE,
+    question_id INT NOT NULL REFERENCES questions(id) ON DELETE RESTRICT,
+    choice_id INT NOT NULL REFERENCES choices(id) ON DELETE RESTRICT
+);
