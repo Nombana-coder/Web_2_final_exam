@@ -21,8 +21,45 @@ Response 200:
 Response 401: `{ "message": "Invalid credentials" }`
 Response 403 (deactivated account, RG-11): `{ "message": "Account is deactivated" }`
 
+**GET /api/auth/me**
+Requires `Authorization: Bearer <token>`. Returns the current user (rehydrates session on page reload).
+Response 200:
+```json
+{ "id": 1, "name": "Admin", "email": "admin@examhub.com", "role": "admin", "active": true }
+```
+Response 401: `{ "message": "Invalid or expired token" }`
+
 ## Student
 
+All `/api/students` routes require `Authorization: Bearer <token>` for an **admin** user (403 otherwise).
+
+**GET /api/students?page=1&limit=10** — paginated list, shape per "Pagination" section below.
+
+**GET /api/students/:id**
+Response 200: student object (see below). Response 404 if not found.
+
+**POST /api/students**
+Request:
+```json
+{ "name": "Jane Doe", "email": "jane@student.com", "password": "secret123" }
+```
+Response 201: student object. Response 409 if email already in use.
+
+**PUT /api/students/:id**
+Request (either field optional):
+```json
+{ "name": "Jane D.", "email": "jane.d@student.com" }
+```
+Response 200: updated student object. Response 404 / 409 (email conflict) as applicable.
+
+**PATCH /api/students/:id/active**
+Request:
+```json
+{ "active": false }
+```
+Response 200: updated student object. Used to deactivate/reactivate (RG-11) — a deactivated student can no longer log in.
+
+Student object shape:
 ```json
 {
   "id": 1,

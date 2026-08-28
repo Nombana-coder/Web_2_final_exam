@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { testDbConnection } from "./security/db";
 import { errorHandler } from "./middlewares/errorHandler";
 import authRoutes from "./controllers/authRoutes";
+import studentRoutes from "./controllers/studentRoutes";
 
 dotenv.config();
 
@@ -13,14 +14,16 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
-
-// --- Other teammates mount their own router under /api here, e.g.: ---
-//   app.use("/api/students", studentsRouter);
-//   app.use("/api/courses", coursesRouter);
-//   app.use("/api/exams", examsRouter);
+app.use("/api/students", studentRoutes);
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
+});
+
+// 404 for anything under /api that no router matched (RG-13 JSON shape,
+// not Express's default HTML error page)
+app.use("/api", (_req, res) => {
+  res.status(404).json({ message: "Not found" });
 });
 
 // Error handler must be registered LAST
