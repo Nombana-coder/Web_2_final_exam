@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { testDbConnection } from "./security/db";
 import { errorHandler } from "./middlewares/errorHandler";
-import authRoutes from "./controllers/authRoutes";
+import authRoutes from "./routes/authRoutes";
 import studentRoutes from "./controllers/studentRoutes";
 
 dotenv.config();
@@ -20,8 +20,7 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-// 404 for anything under /api that no router matched (RG-13 JSON shape,
-// not Express's default HTML error page)
+// 404 for anything under /api that no router matched (RG-13 JSON shape, not Express's default HTML error page)
 app.use("/api", (_req, res) => {
   res.status(404).json({ message: "Not found" });
 });

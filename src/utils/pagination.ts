@@ -1,18 +1,10 @@
-/**
- * Shared pagination helpers
- * I put 10 items/page by default, go check API_CONTRACT.md. (0_0* )
- * Other domains (Courses/Exams/Questions) can reuse this on their own
- * list endpoints to keep the response shape consistent:
- *   { data, page, limit, total, total_pages }
- */
-
 export interface PaginationParams {
   page: number;
   limit: number;
   offset: number;
 }
 
-export interface PaginatedResult<T> {
+export interface PaginatedResponse<T> {
   data: T[];
   page: number;
   limit: number;
@@ -21,37 +13,36 @@ export interface PaginatedResult<T> {
 }
 
 const DEFAULT_PAGE = 1;
-const DEFAULT_LIMIT = 10;
+const DEFAULT_LIMIT = 10; // confirmé équipe : 10 items par page
 const MAX_LIMIT = 100;
 
 
-export function parsePagination(
-  rawPage: unknown,
-  rawLimit: unknown
-): PaginationParams {
-  let page = Number(rawPage);
-  let limit = Number(rawLimit);
+export function parsePagination(query: any): PaginationParams {
+  const rawPage = parseInt(query.page, 10);
+  const rawLimit = parseInt(query.limit, 10);
 
-  if (!Number.isFinite(page) || page < 1) page = DEFAULT_PAGE;
-  if (!Number.isFinite(limit) || limit < 1) limit = DEFAULT_LIMIT;
+  const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : DEFAULT_PAGE;
+  const limit =
+    Number.isFinite(rawLimit) && rawLimit > 0
+      ? Math.min(rawLimit, MAX_LIMIT)
+      : DEFAULT_LIMIT;
 
-  page = Math.floor(page);
-  limit = Math.min(Math.floor(limit), MAX_LIMIT);
+  const offset = (page - 1) * limit;
 
-  return { page, limit, offset: (page - 1) * limit };
+  return { page, limit, offset };
 }
 
-export function buildPaginatedResult<T>(
+export function buildPaginatedResponse<T>(
   data: T[],
   total: number,
   page: number,
   limit: number
-): PaginatedResult<T> {
+): PaginatedResponse<T> {
   return {
     data,
     page,
     limit,
     total,
-    total_pages: limit > 0 ? Math.ceil(total / limit) : 0,
+    total_pages: Math.max(1, Math.ceil(total / limit)),
   };
 }
