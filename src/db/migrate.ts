@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { pool } from "../security/db";
 
-async function migrate(): Promise<void> {
+export async function migrate(): Promise<void> {
   const migrationsDirectory = path.join(__dirname, "migrations");
   const files = (await fs.readdir(migrationsDirectory))
     .filter((file) => /^\d+_.+\.sql$/.test(file))
@@ -38,11 +38,17 @@ async function migrate(): Promise<void> {
     }
   } finally {
     client.release();
-    await pool.end();
   }
 }
 
-migrate().catch((error: unknown) => {
-  console.error("Migration failed:", error);
-  process.exitCode = 1;
-});
+if (require.main === module) {
+  migrate()
+    .then(() => {
+      console.log("Migrations complete");
+      return pool.end();
+    })
+    .catch((error: unknown) => {
+      console.error("Migration failed:", error);
+      process.exitCode = 1;
+    });
+}

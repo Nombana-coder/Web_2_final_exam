@@ -1,14 +1,16 @@
-CREATE TABLE IF NOT EXISTS exams (
-    id          SERIAL PRIMARY KEY,
-    course_id   INTEGER NOT NULL REFERENCES courses(id) ON DELETE RESTRICT,
-    title       VARCHAR(150) NOT NULL,
-    description TEXT,
-    start_at    TIMESTAMPTZ NOT NULL,
-    end_at      TIMESTAMPTZ NOT NULL,
-    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT chk_exam_window CHECK (end_at > start_at)
-);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_name = 'courses' AND column_name = 'updated_at'
+  ) THEN
+    EXECUTE 'ALTER TABLE courses ADD COLUMN updated_at TIMESTAMPTZ';
+    EXECUTE 'UPDATE courses SET updated_at = created_at WHERE updated_at IS NULL';
+    EXECUTE 'ALTER TABLE courses ALTER COLUMN updated_at SET DEFAULT now()';
+    EXECUTE 'ALTER TABLE courses ALTER COLUMN updated_at SET NOT NULL';
+  END IF;
+END $$;
 
 DO $$
 DECLARE
@@ -46,39 +48,12 @@ BEGIN
     EXECUTE 'ALTER TABLE exams RENAME COLUMN end_time TO end_at';
   END IF;
 
-  IF has_start_time AND has_start_at THEN
-    EXECUTE 'UPDATE exams SET start_at = start_time WHERE start_at IS NULL AND start_time IS NOT NULL';
-  END IF;
-
-  IF has_end_time AND has_end_at THEN
-    EXECUTE 'UPDATE exams SET end_at = end_time WHERE end_at IS NULL AND end_time IS NOT NULL';
-  END IF;
-
   IF NOT has_updated_at THEN
     EXECUTE 'ALTER TABLE exams ADD COLUMN updated_at TIMESTAMPTZ';
     EXECUTE 'UPDATE exams SET updated_at = created_at WHERE updated_at IS NULL';
     EXECUTE 'ALTER TABLE exams ALTER COLUMN updated_at SET DEFAULT now()';
     EXECUTE 'ALTER TABLE exams ALTER COLUMN updated_at SET NOT NULL';
   END IF;
-END $$;
-
-ALTER TABLE exams
-  ADD COLUMN IF NOT EXISTS start_at TIMESTAMPTZ,
-  ADD COLUMN IF NOT EXISTS end_at TIMESTAMPTZ,
-  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ;
-
-DO $$
-DECLARE
-  has_start_time boolean;
-  has_end_time boolean;
-BEGIN
-  SELECT EXISTS (
-    SELECT 1 FROM information_schema.columns WHERE table_name = 'exams' AND column_name = 'start_time'
-  ) INTO has_start_time;
-
-  SELECT EXISTS (
-    SELECT 1 FROM information_schema.columns WHERE table_name = 'exams' AND column_name = 'end_time'
-  ) INTO has_end_time;
 
   IF has_start_time THEN
     EXECUTE 'UPDATE exams SET start_at = start_time WHERE start_at IS NULL AND start_time IS NOT NULL';
@@ -87,12 +62,31 @@ BEGIN
   IF has_end_time THEN
     EXECUTE 'UPDATE exams SET end_at = end_time WHERE end_at IS NULL AND end_time IS NOT NULL';
   END IF;
+
+  IF has_start_time THEN
+    EXECUTE 'ALTER TABLE exams DROP COLUMN start_time';
+  END IF;
+
+  IF has_end_time THEN
+    EXECUTE 'ALTER TABLE exams DROP COLUMN end_time';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns WHERE table_name = 'exams' AND column_name = 'start_at'
+  ) THEN
+    EXECUTE 'ALTER TABLE exams ADD COLUMN start_at TIMESTAMPTZ';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns WHERE table_name = 'exams' AND column_name = 'end_at'
+  ) THEN
+    EXECUTE 'ALTER TABLE exams ADD COLUMN end_at TIMESTAMPTZ';
+  END IF;
+
+  EXECUTE 'ALTER TABLE exams ALTER COLUMN start_at SET DEFAULT now()';
+  EXECUTE 'ALTER TABLE exams ALTER COLUMN end_at SET DEFAULT now()';
+  EXECUTE 'ALTER TABLE exams ALTER COLUMN updated_at SET DEFAULT now()';
+  EXECUTE 'ALTER TABLE exams ALTER COLUMN start_at SET NOT NULL';
+  EXECUTE 'ALTER TABLE exams ALTER COLUMN end_at SET NOT NULL';
+  EXECUTE 'ALTER TABLE exams ALTER COLUMN updated_at SET NOT NULL';
 END $$;
-
-ALTER TABLE exams
-  ALTER COLUMN start_at SET DEFAULT now(),
-  ALTER COLUMN end_at SET DEFAULT now(),
-  ALTER COLUMN updated_at SET DEFAULT now();
-
-CREATE INDEX IF NOT EXISTS idx_exams_course_id ON exams (course_id);
-CREATE INDEX IF NOT EXISTS idx_exams_window ON exams (start_at, end_at);
