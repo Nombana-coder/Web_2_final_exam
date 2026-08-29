@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { StudentRepository } from "../repositories/StudentRepository";
 import { UserRepository } from "../repositories/UserRepository";
-import { Conflict, NotFound } from "../security/AppError";
+import { BadRequest, Conflict, NotFound } from "../security/AppError";
 import { toPublicUser, PublicUser } from "../models/User";
 import {
   parsePagination,
@@ -85,6 +85,25 @@ export const StudentService = {
     if (!updated) {
       throw NotFound("Student not found");
     }
+    return toPublicUser(updated);
+  },
+
+  async resetPassword(id: number, password: string): Promise<PublicUser> {
+    const student = await StudentRepository.findById(id);
+    if (!student) {
+      throw NotFound("Student not found");
+    }
+
+    if (typeof password !== "string" || password.length < 6) {
+      throw BadRequest("Password must be at least 6 characters long");
+    }
+
+    const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
+    const updated = await StudentRepository.setPassword(id, password_hash);
+    if (!updated) {
+      throw NotFound("Student not found");
+    }
+
     return toPublicUser(updated);
   },
 };

@@ -66,3 +66,21 @@ export const setStudentActive = asyncHandler(async (req: Request, res: Response)
   const student = await StudentService.setActive(id, active);
   res.status(200).json(student);
 });
+
+export const resetStudentPassword = asyncHandler(async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id)) {
+    throw BadRequest("Invalid student id");
+  }
+
+  const { password } = req.body ?? {};
+  if (!password || typeof password !== "string" || password.length < 6) {
+    throw BadRequest("Password must be at least 6 characters long");
+  }
+
+  const student = await StudentService.resetPassword(id, password);
+  res.status(200).json({
+    message: "Password reset successfully",
+    student,
+  });
+});

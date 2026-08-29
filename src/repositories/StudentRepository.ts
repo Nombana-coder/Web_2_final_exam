@@ -76,4 +76,15 @@ export const StudentRepository = {
     );
     return result.rows[0] ?? null;
   },
+
+  async setPassword(id: number, passwordHash: string): Promise<User | null> {
+    const result = await pool.query<User>(
+      `UPDATE users
+       SET password_hash = $2
+       WHERE id = $1 AND role = 'student'
+       RETURNING *`,
+      [id, passwordHash]
+    );
+    return result.rows[0] ?? null;
+  },
 };
