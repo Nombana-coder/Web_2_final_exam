@@ -83,13 +83,28 @@ async saveAttempt(
 
     async getStudentResults(studentId: number) {
         const { rows: results } = await pool.query(
-            `SELECT a.id, a.score, a.submitted_at, e.title as exam_title
-            FROM attempts a JOIN exams e ON a.exam_id = e.id
-            WHERE a.student_id = $1 ORDER BY a.submitted_at DESC;`,
+            `SELECT a.id, a.score, a.submitted_at, e.title as exam_title,
+                    COALESCE(q.max_points, 0) as max_score
+            FROM attempts a
+            JOIN exams e ON a.exam_id = e.id
+            LEFT JOIN (
+                SELECT exam_id, SUM(points) AS max_points
+                FROM questions
+                GROUP BY exam_id
+            ) q ON q.exam_id = e.id
+            WHERE a.student_id = $1
+            ORDER BY a.submitted_at DESC;`,
             [studentId]
         );
         const { rows: avg } = await pool.query(
-            `SELECT AVG(score) as average FROM attempts WHERE student_id = $1;`,
+            `SELECT AVG((a.score::numeric / NULLIF(COALESCE(q.max_points, a.score), 0)) * 20) as average
+            FROM attempts a
+            LEFT JOIN (
+                SELECT exam_id, SUM(points) AS max_points
+                FROM questions
+                GROUP BY exam_id
+            ) q ON q.exam_id = a.exam_id
+            WHERE a.student_id = $1;`,
             [studentId]
         );
         return { results, average: Number(avg[0]?.average || 0) };
